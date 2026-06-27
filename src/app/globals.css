@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+:root {
+  --color-amber: #f59e0b;
+}
+
+body {
+  background: #0a0a0f;
+  color: #e5e5e5;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 发光按钮 */
+.btn-glow {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #0a0a0f;
+  font-weight: 600;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+}
+.btn-glow:hover {
+  box-shadow: 0 0 40px rgba(245, 158, 11, 0.5);
+  transform: translateY(-2px);
+}
+
+/* 卡片 */
+.card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 24px;
+  backdrop-filter: blur(12px);
+}
+
+/* 输入框 */
+input, select, textarea {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  width: 100%;
+  font-size: 16px;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245,158,11,0.2);
+}
+
+/* Markdown 报告样式 */
+.report h1 { font-size: 1.5rem; font-weight: bold; margin: 1rem 0 0.5rem; color: #f59e0b; }
+.report h2 { font-size: 1.2rem; font-weight: bold; margin: 0.8rem 0 0.4rem; color: #fbbf24; }
+.report p { margin: 0.5rem 0; line-height: 1.7; }
+.report strong { color: #f59e0b; }
