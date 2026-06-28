@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
+import { getDictionary, Lang } from "@/i18n/dictionaries";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ""
@@ -17,7 +18,8 @@ interface ChartPreview {
   elementBalance: string;
 }
 
-export default function ReadingPage() {
+export default function ReadingPage({ params: { lang } }: { params: { lang: Lang } }) {
+  const dict = getDictionary(lang);
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<ChartPreview | null>(null);
   const [error, setError] = useState("");
@@ -25,8 +27,8 @@ export default function ReadingPage() {
     name: "",
     birth: "",
     time: "12:00",
-    gender: "男",
-    city: "北京",
+    gender: lang === "zh" ? "男" : "Male",
+    city: lang === "zh" ? "北京" : "New York",
   });
 
   const handlePreview = async (e: React.FormEvent) => {
@@ -55,7 +57,7 @@ export default function ReadingPage() {
         setPreview(data);
       }
     } catch {
-      setError("网络错误，请重试");
+      setError(dict.reading.error.network);
     } finally {
       setLoading(false);
     }
@@ -81,10 +83,10 @@ export default function ReadingPage() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        setError("创建支付链接失败");
+        setError(dict.reading.error.payment);
       }
     } catch {
-      setError("支付服务暂时不可用");
+      setError(dict.reading.error.service);
     } finally {
       setLoading(false);
     }
@@ -92,27 +94,23 @@ export default function ReadingPage() {
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold text-center mb-2">
-        🔮 命盘解读
-      </h1>
-      <p className="text-center text-gray-400 mb-10">
-        免费预览八字 + 星座速览 · 付费解锁完整四套系统深度解读
-      </p>
+      <h1 className="text-3xl font-bold text-center mb-2">{dict.reading.title}</h1>
+      <p className="text-center text-gray-400 mb-10">{dict.reading.subtitle}</p>
 
-      {/* 输入表单 */}
+      {/* Input Form */}
       <form onSubmit={handlePreview} className="card max-w-lg mx-auto mb-8">
         <div className="grid gap-4">
           <div>
-            <label className="text-sm text-gray-400 mb-1 block">姓名</label>
+            <label className="text-sm text-gray-400 mb-1 block">{dict.reading.form.name}</label>
             <input
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="你的姓名"
+              placeholder={dict.reading.form.namePlaceholder}
               required
             />
           </div>
           <div>
-            <label className="text-sm text-gray-400 mb-1 block">出生日期</label>
+            <label className="text-sm text-gray-400 mb-1 block">{dict.reading.form.birth}</label>
             <input
               type="date"
               value={form.birth}
@@ -122,7 +120,7 @@ export default function ReadingPage() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm text-gray-400 mb-1 block">时间 (可选)</label>
+              <label className="text-sm text-gray-400 mb-1 block">{dict.reading.form.time}</label>
               <input
                 type="time"
                 value={form.time}
@@ -130,59 +128,59 @@ export default function ReadingPage() {
               />
             </div>
             <div>
-              <label className="text-sm text-gray-400 mb-1 block">性别</label>
+              <label className="text-sm text-gray-400 mb-1 block">{dict.reading.form.gender}</label>
               <select
                 value={form.gender}
                 onChange={(e) => setForm({ ...form, gender: e.target.value })}
               >
-                <option>男</option>
-                <option>女</option>
+                <option>{dict.reading.form.male}</option>
+                <option>{dict.reading.form.female}</option>
               </select>
             </div>
           </div>
           <div>
-            <label className="text-sm text-gray-400 mb-1 block">出生城市 (可选)</label>
+            <label className="text-sm text-gray-400 mb-1 block">{dict.reading.form.city}</label>
             <input
               value={form.city}
               onChange={(e) => setForm({ ...form, city: e.target.value })}
-              placeholder="如：北京、上海、天津"
+              placeholder={dict.reading.form.cityPlaceholder}
             />
           </div>
           {error && <p className="text-red-400 text-sm">{error}</p>}
           <button type="submit" disabled={loading} className="btn-glow w-full">
-            {loading ? "分析中..." : "🔍 免费预览命盘"}
+            {loading ? dict.reading.form.analyzing : dict.reading.form.preview}
           </button>
         </div>
       </form>
 
-      {/* 预览结果 */}
+      {/* Preview Result */}
       {preview && (
         <div className="card max-w-lg mx-auto mb-8 border-amber-400/20">
           <h2 className="text-xl font-bold mb-4 text-amber-400">
-            📊 {form.name || "你"} 的命盘速览
+            📊 {form.name || dict.reading.preview.title}
           </h2>
           <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
             <div className="bg-white/5 rounded-lg p-3">
-              <span className="text-gray-500">八字</span>
+              <span className="text-gray-500">{dict.reading.preview.bazi}</span>
               <p className="font-mono text-lg">{preview.bazi}</p>
             </div>
             <div className="bg-white/5 rounded-lg p-3">
-              <span className="text-gray-500">日主</span>
+              <span className="text-gray-500">{dict.reading.preview.dayMaster}</span>
               <p className="font-mono text-lg">{preview.dayMaster}</p>
             </div>
             <div className="bg-white/5 rounded-lg p-3">
-              <span className="text-gray-500">太阳星座</span>
+              <span className="text-gray-500">{dict.reading.preview.sunSign}</span>
               <p className="text-lg">{preview.sunSign}</p>
             </div>
             <div className="bg-white/5 rounded-lg p-3">
-              <span className="text-gray-500">月亮星座</span>
+              <span className="text-gray-500">{dict.reading.preview.moonSign}</span>
               <p className="text-lg">{preview.moonSign}</p>
             </div>
           </div>
 
-          {/* 五行图 */}
+          {/* 5 Elements Chart */}
           <div className="mb-6">
-            <span className="text-sm text-gray-500">五行分布</span>
+            <span className="text-sm text-gray-500">{dict.reading.preview.wuxing}</span>
             <div className="flex gap-2 mt-2 h-6">
               {["金","木","水","火","土"].map((wx) => {
                 const cnt = preview.wuxing?.[wx] || 0;
@@ -202,33 +200,31 @@ export default function ReadingPage() {
           )}
 
           <div className="bg-gradient-to-r from-amber-900/20 to-amber-800/10 rounded-lg p-4 mb-4">
-            <p className="text-sm text-amber-300">
-              🔒 以上为免费预览。解锁完整报告获取：八字格局分析 · 紫微十二宫 · 奇门方位 · 占星相位 · 综合运势
-            </p>
+            <p className="text-sm text-amber-300">{dict.reading.preview.locked}</p>
           </div>
 
           <button onClick={handlePurchase} disabled={loading} className="btn-glow w-full">
-            {loading ? "跳转支付..." : `🔓 解锁完整报告 · $9.99`}
+            {loading ? dict.reading.preview.paying : dict.reading.preview.unlock}
           </button>
         </div>
       )}
 
-      {/* 信任区 */}
+      {/* Trust Badges */}
       <section className="max-w-lg mx-auto grid grid-cols-3 gap-4 text-center text-sm text-gray-500">
         <div className="card">
           <p className="text-2xl mb-1">🔐</p>
-          <p>安全支付</p>
-          <p className="text-xs">Stripe 加密</p>
+          <p>{dict.reading.trust.secure}</p>
+          <p className="text-xs">{dict.reading.trust.secureDesc}</p>
         </div>
         <div className="card">
           <p className="text-2xl mb-1">⚡</p>
-          <p>即时生成</p>
-          <p className="text-xs">AI 实时分析</p>
+          <p>{dict.reading.trust.instant}</p>
+          <p className="text-xs">{dict.reading.trust.instantDesc}</p>
         </div>
         <div className="card">
           <p className="text-2xl mb-1">📧</p>
-          <p>PDF 报告</p>
-          <p className="text-xs">邮件自动发送</p>
+          <p>{dict.reading.trust.pdf}</p>
+          <p className="text-xs">{dict.reading.trust.pdfDesc}</p>
         </div>
       </section>
     </main>
